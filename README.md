@@ -1,4 +1,4 @@
-# AskUS
- export FLASK_APP=
- export FLASK_ENV=development
- flask run
+# AskUS<br/>
+ export FLASK_APP= <br/>
+ export FLASK_ENV=development<br/>
+ flask run<br/>
