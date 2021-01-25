@@ -1,42 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <title>AskUs</title>
-    <style>
-        .center_class{
-        text-align: center;
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+      <title>AskUs</title>
+      <style>
+         .center_class{
+         text-align: center;
          display: block;
          margin: 0 auto;
-        width: 300px;
-        };
-    </style>
-</head>
-<body>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
-  <div class="text-center" style = "text-align: center;">
-  <br> <br> <br> <br> <br> <br>
-
-  <form action = "/login" method = "post">
-    <div class="form-group">
-      <label for="exampleInputEmail1">Username</label>
-      <input type="text" class="form-control input-sm center_class" name="inputUname" placeholder="Enter username">
-    </div>
-    <div class="form-group">
-      <label for="exampleInputPassword1">Password</label>
-      <input type="password" class="form-control input-sm center_class" name="inputPasswd" placeholder="Enter password">
-    </div>
-    <br>
-    <button type="submit" class="btn btn-primary">Submit</button>
-    <br> <br>
-    <a class="nav-link" href="/register">Don't have an account? Register now!</a>
-  </form>
-  </div>  
-</body>
+         width: 300px;
+         };
+      </style>
+   </head>
+   <body>
+      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+      <script>
+         function login() {
+         var inputUname = document.getElementById('inputUname').value;
+         var inputPasswd = document.getElementById('inputPasswd').value;
+         
+         var request = new XMLHttpRequest();
+         request.open("POST", "/login", true);
+         request.onload = function() {
+         var token = JSON.parse(request.responseText).token;
+         if (token != null) {
+           document.cookie = 'token=' + token + ';';
+           document.location = '/';
+         } else {
+           alert('Could not login');
+         }
+         
+         }
+         request.send(JSON.stringify({
+           inputUname: inputUname,
+           inputPasswd: inputPasswd
+         }
+         ));
+         }
+      </script>
+      <div class="text-center" style = "text-align: center;">
+         <br> <br> <br> <br> <br> <br>
+         <!-- Div for flashed messages -->
+         <div class="content" style="max-width: 800px; margin: 0 auto">
+            {% for message in get_flashed_messages() %}
+            <p style="color: red;">{{ message }}</p>
+            {% endfor %}
+         </div>
+         <!-- End Div for flashed messages -->
+         <form action = "/login" method = "post">
+            <div class="form-group">
+               <label for="exampleInputEmail1">Username</label>
+               <input type="text" class="form-control input-sm center_class" name="inputUname" id="inputUname" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+               <label for="exampleInputPassword1">Password</label>
+               <input type="password" class="form-control input-sm center_class" name="inputPasswd" id="inputPasswd" placeholder="Enter password">
+            </div>
+            <br>
+            <button type="button" onclick="login()" class="btn btn-primary">Submit</button>
+            <br> <br>
+            <a class="nav-link" href="/register">Don't have an account? Register now!</a>
+         </form>
+      </div>
+   </body>
 </html>
