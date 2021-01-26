@@ -46,6 +46,12 @@ class Member(database.Model):
         return ser.dumps({'uname': self.uname})
 
 
+class Category(database.Model):
+    id = database.Column(database.Integer, primary_key=True)
+    title = database.Column(database.String, nullable = False)
+    desc = database.Column(database.String, nullable = False)
+    
+
 def verify_token(token):
     ser = TimedJSONWebSignatureSerializer(app.secret_key)
     try:
@@ -69,9 +75,14 @@ def stop_logged_users(func):
 @app.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == 'GET':
+        isLogged = False
         token = request.cookies.get('token')
-        print("Token: ", token)
-        return render_template('index.html')
+        if token != None and token != "":
+            isLogged = True
+
+        categories = Category.query.all()
+
+        return render_template('index.html', isLogged = isLogged, categories= categories)
     if request.method == 'POST':
         pass
 
@@ -109,6 +120,28 @@ def register():
         else:
             flash("Password does not match")
             return redirect(url_for('register'))
+
+
+@app.route("/add-category", methods=['GET', 'POST'])
+def add_category():
+    if request.method =='GET':
+        return render_template('add-category.html') #TODO
+    if request.method == 'POST':
+        title = request.form['inputTitle']
+        desc = request.form['inputDesc']
+        if not Category.query.filter_by(title=title).first():
+            database.session.add(Category(title=title, desc=desc))
+            database.session.commit()
+        else:
+            flash("A category with this title already exists.")
+            return redirect(url_for('add_category'))
+        return redirect('/')
+
+@app.route("/category/<category_id>", methods=['GET', 'POST'])
+def category_page(category_id):
+    # posts = Post.query.filter_by(category_id=category_id)
+    return render_template('category.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
