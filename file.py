@@ -22,6 +22,22 @@ app.secret_key = "z7zNJscnjeprNqpEeBLXJTUnDkPL3y7P"
 
 database = sql(app)
 
+regexem = '^[a-z0-9]+?[\._]?[a-z0-9]+[@]\w+[.]\w+$'
+regexpw = '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$'
+
+def checkemail(email):
+    if (re.search(regexem, email)):
+        return 1
+    else:
+        return 0
+
+def checkpass(password):
+    if (re.search(regexpw, password)):
+        return 1
+    else:
+        return 0
+ 
+
 class Member(database.Model):
     id = database.Column(database.Integer, primary_key=True)
     uname = database.Column(database.String, nullable = False)
@@ -143,14 +159,22 @@ def register():
         passwd = request.form['inputPasswd']
         conf_passwd = request.form['inputConf_Passwd']
 
-        if passwd == conf_passwd:
+        validemail = checkemail(email)
+        validpw = checkpass(passwd) 
+        if validemail == 0:
+            flash("Please enter a valid email!")
+            return redirect(url_for('register'))
+        elif validpw == 0:
+            flash("Password must contain at least eight characters, one uppercase letter, one lowercase letter and one number!")
+            return redirect(url_for('register'))
+        elif passwd != conf_passwd:
+            flash("Passwords do not match!")
+            return redirect(url_for('register'))
+        else:
             database.session.add(Member(uname=uname, email = email, passwd = passwd))
             database.session.commit()
             return redirect("/")
-        else:
-            flash("Passwords do not match!")
-            return redirect(url_for('register'))
-        
+
 
 
 @app.route("/add-category", methods=['GET', 'POST'])
