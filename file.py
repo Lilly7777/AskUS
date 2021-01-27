@@ -11,7 +11,9 @@ from itsdangerous import TimedJSONWebSignatureSerializer
 from itsdangerous import BadSignature
 from itsdangerous import SignatureExpired
 from functools import wraps
+from datetime import datetime
 import json
+import re
         
 
 app = Flask(__name__)
@@ -44,6 +46,18 @@ class Member(database.Model):
     def gen_token(self):
         ser = TimedJSONWebSignatureSerializer(app.secret_key, expires_in=3600)
         return ser.dumps({'uname': self.uname})
+    
+    @staticmethod
+    def find_by_token(token):
+        if not token:
+            return None
+
+        try:
+            ser = TimedJSONWebSignatureSerializer(app.secret_key)
+            payload = ser.loads(token)
+            return Member.query.filter_by(uname=payload.get('uname')).first()
+        except SignatureExpired:
+            return None
 
 
 class Category(database.Model):
@@ -51,6 +65,13 @@ class Category(database.Model):
     title = database.Column(database.String, nullable = False)
     desc = database.Column(database.String, nullable = False)
     
+class Post(database.Model):
+    id = database.Column(database.Integer, primary_key=True)
+    title = database.Column(database.String, nullable = False)
+    uname = database.Column(database.String, nullable = False)
+    content = database.Column(database.String, nullable = False)
+    timestamp = database.Column(database.DateTime, nullable=False, default=datetime.utcnow)
+    category_id = database.Column(database.Integer, database.ForeignKey(Category.id), nullable=False)
 
 def verify_token(token):
     ser = TimedJSONWebSignatureSerializer(app.secret_key)
@@ -72,6 +93,16 @@ def stop_logged_users(func):
         return func(*args, **kwargs)
     return wrapper
 
+def require_login(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        token = request.cookies.get('token')
+        if not token or not verify_token(token):
+            flash('You have to be logged in to access this page')
+            return redirect('/login')
+        return func(*args, **kwargs)
+    return wrapper
+
 @app.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == 'GET':
@@ -79,9 +110,7 @@ def home():
         token = request.cookies.get('token')
         if token != None and token != "":
             isLogged = True
-
         categories = Category.query.all()
-
         return render_template('index.html', isLogged = isLogged, categories= categories)
     if request.method == 'POST':
         pass
@@ -100,6 +129,7 @@ def login():
         if member != None and member.verify_passwd(passwd):
             return jsonify({'token': member.gen_token().decode('ascii')})
         else:
+            flash("Incorrect username or password!")
             return jsonify({'token': None})
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -118,11 +148,13 @@ def register():
             database.session.commit()
             return redirect("/")
         else:
-            flash("Password does not match")
+            flash("Passwords do not match!")
             return redirect(url_for('register'))
+        
 
 
 @app.route("/add-category", methods=['GET', 'POST'])
+@require_login
 def add_category():
     if request.method =='GET':
         return render_template('add-category.html') #TODO
@@ -139,8 +171,31 @@ def add_category():
 
 @app.route("/category/<category_id>", methods=['GET', 'POST'])
 def category_page(category_id):
-    # posts = Post.query.filter_by(category_id=category_id)
-    return render_template('category.html')
+    isLogged = False
+    token = request.cookies.get('token')
+    if token != None and token != "":
+        isLogged = True
+    posts = Post.query.filter_by(category_id=category_id)
+    token = request.cookies.get('token')
+    uname = ""
+    if Member.find_by_token(token):
+        uname = Member.find_by_token(token).uname
+    return render_template('category.html', category_id=category_id, posts=posts, uname=uname, isLogged = isLogged)
+
+@app.route("/category/<category_id>/add-post", methods=['GET', 'POST'])
+def add_post(category_id):
+    if request.method =='GET':
+        return render_template('add-post.html', category_id=category_id) #TODO
+    if request.method == 'POST':
+        title = request.form['inputTitle']
+        content = request.form['inputContent']
+        token = request.cookies.get('token')
+        uname = Member.find_by_token(token).uname
+
+        database.session.add(Post(title=title, content=content, uname=uname, category_id=category_id))
+        database.session.commit()
+        
+        return redirect(('/category/' + str(category_id))) 
 
 
 if __name__ == '__main__':
