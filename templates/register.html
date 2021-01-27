@@ -32,7 +32,6 @@
                   </a>
                </li>
             </ul>
-            {% if isLogged == False %}
             <a class="nav-link" style="color: #2e4167;" href="/register">
                <h4> Register</h4>
             </a>
@@ -40,15 +39,19 @@
             <a class="nav-link" style="color: #2e4167;" href="/login">
                <h4> Login</h4>
             </a>
-            {% elif isLogged == True %}
-           <button type="button" onClick="logout()" class="btn btn-outline-dark"><h4> Log out</h4></button>
-           {% endif %}
 
             </li> 
          </div>
       </nav> 
+      <br> <br> 
       <div class="text-center" style = "text-align: center;">
-         <br> <br> <br> 
+         <div class="content" style="max-width: 800px; margin: 0 auto">
+         {% for message in get_flashed_messages() %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+         {% endfor %}
+         </div>
+
+         <br> <br> 
          <form action = "/register" method = "post">
             <div class="form-group">
                <label for="exampleInputEmail1"> <h4>Username</h4></label>
@@ -56,7 +59,7 @@
             </div>
             <div class="form-group">
                <label for="exampleInputEmail1"> <h4>Email address</h4></label>
-               <input type="email" class="form-control input-sm center_class" name="inputEmail" placeholder="Enter email">
+               <input type="text" class="form-control input-sm center_class" name="inputEmail" placeholder="Enter email">
             </div>
             <div class="form-group">
                <label for="exampleInputPassword1"> <h4>Password</h4></label>
