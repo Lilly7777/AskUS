@@ -1,1 +1,116 @@
-<h3></h3>
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+      <title>AskUs</title>
+      <style>
+         a:link, a:visited, a:hover, a:active{
+         color: black;
+         background-color: transparent;
+         text-decoration: none;
+         }
+
+         .center_class{
+         text-align: center;
+         display: block;
+         margin: 0 auto;
+         width: 50rem;
+         };
+      </style>
+
+      <script>
+         function delete_cookie(name) {
+            document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+         }
+
+         function logout() {
+            delete_cookie('token');
+            document.location = '/';
+         }
+      </script>
+
+   </head>
+   <body>
+      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+     
+       
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+         <img id="currentPhoto" src="/static/askuslogo.jpg" onerror="this.onerror=null; this.src='templates/askuslogo.jpg'" alt="" width="180" height="70" >
+         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+               <li class="nav-item active">
+                  <a class="nav-link" style="color: #2e4167;" href="/">
+                     <h4><strong>Home</strong></h4>
+                     <span class="sr-only">(current)</span>
+                  </a>
+               </li>
+            </ul>
+            {% if isLogged == False %}
+            <a class="nav-link" style="color: #2e4167;" href="/register">
+               <h4> Register</h4>
+            </a>
+
+            <a class="nav-link" style="color: #2e4167;" href="/login">
+               <h4> Login</h4>
+            </a>
+            {% elif isLogged == True %}
+           <button type="button" onClick="logout()" class="btn btn-outline-info"><h4> Log out</h4></button>
+           {% endif %}
+               
+            </li> 
+         </div>
+      </nav>   
+      <br>
+      {% if isLogged == True %}
+      <button type="button"  class="btn btn-info btn-lg btn-block">
+         <a class="nav-link" style="color: #ffffff;" href="/category/{{category_id}}/add-post">
+            <strong><h4>+ post</h4> </strong>
+         </a>
+      </button>
+      {% endif %}
+      <br> <br> 
+      {% for post in posts %}
+      <div class="card center_class">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{post.title}}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{post.uname}} @ {{post.timestamp}}</h6>
+          <p class="card-text">{{post.content}}</p>
+          {% if post.uname==uname %}
+          <button type="button" class="btn btn-primary btn-info">Edit</button>
+          <button type="button" class="btn btn-secondary btn-secondary">Delete</button>
+          {%endif%}
+        </div>
+      </div>
+      <br>
+      {%endfor%}
+      <!-- {% for category in categories %}
+      <div class="card center_class">
+         <div class="card-body text-center">
+           <h5 class="card-title"> 
+              <a class="nav-link" style="color: black;" href="/category/{{category.id}}">{{category.title}}
+            </a>
+         </h5>
+           <p class="card-text"> {{category.desc}}</p>
+         </div>
+       </div>
+       <br>
+      {%endfor%} -->
+
+
+      <!-- Div for flashed messages -->
+      <div class="content" style="max-width: 800px; margin: 0 auto">
+         {% for message in get_flashed_messages() %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+         {% endfor %}
+      </div>
+      <!-- End Div for flashed messages -->
+   
+   </body>
+</html>
