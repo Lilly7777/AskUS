@@ -20,31 +20,29 @@
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
       <script>
          function login() {
-         var inputUname = document.getElementById('inputUname').value;
-         var inputPasswd = document.getElementById('inputPasswd').value;
-         
-         var request = new XMLHttpRequest();
-         request.open("POST", "/login", true);
-         request.onload = function() {
-         var token = JSON.parse(request.responseText).token;
-         if (token != null) {
-           document.cookie = 'token=' + token + ';';
-           document.location = '/';
-         } else {
-           alert('Could not login');
-         }
-         
-         }
-         request.send(JSON.stringify({
-           inputUname: inputUname,
-           inputPasswd: inputPasswd
-         }
-         ));
+            var inputUname = document.getElementById('inputUname').value;
+            var inputPasswd = document.getElementById('inputPasswd').value;
+            
+            var request = new XMLHttpRequest();
+            request.open("POST", "/login", true);
+            request.onload = function() {
+               var token = JSON.parse(request.responseText).token;
+               if (token != null) {
+                  document.cookie = 'token=' + token + ';';
+                  document.location = '/';
+               }else{
+                  document.location = '/login';
+               }
+            }
+            request.send(JSON.stringify({
+            inputUname: inputUname,
+            inputPasswd: inputPasswd
+            }));
          }
       </script>
       <div class="text-center" style = "text-align: center;">
          <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <img id="currentPhoto" src="/static/askuslogo.jpg" onerror="this.onerror=null; this.src='templates/askuslogo.jpg'" alt="" width="180" height="70" >
+            <img id="currentPhoto" src="/static/askuslogo.jpg" alt="AskUs logo" width="180" height="70" >
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -57,7 +55,6 @@
                      </a>
                   </li>
                </ul>
-               {% if isLogged == False %}
                <a class="nav-link" style="color: #2e4167;" href="/register">
                   <h4> Register</h4>
                </a>
@@ -65,20 +62,15 @@
                <a class="nav-link" style="color: #2e4167;" href="/login">
                   <h4> Login</h4>
                </a>
-               {% elif isLogged == True %}
-              <button type="button" onClick="logout()" class="btn btn-outline-dark"><h4> Log out</h4></button>
-              {% endif %}
    
                </li> 
             </div>
          </nav> 
          <br> <br> <br> <br> 
          <!-- Div for flashed messages -->
-         <div class="content" style="max-width: 800px; margin: 0 auto">
-            {% for message in get_flashed_messages() %}
-            <p style="color: red;">{{ message }}</p>
-            {% endfor %}
-         </div>
+         {% for message in get_flashed_messages() %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+         {% endfor %}
          <!-- End Div for flashed messages -->
          <form action = "/login" method = "post">
             <div class="form-group">
