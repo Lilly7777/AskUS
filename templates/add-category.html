@@ -52,7 +52,7 @@
          <!-- Div for flashed messages -->
          <div class="content" style="max-width: 800px; margin: 0 auto">
             {% for message in get_flashed_messages() %}
-            <p style="color: red;">{{ message }}</p>
+               <div class="alert alert-danger" role="alert">{{ message }}</div>
             {% endfor %}
          </div>
          <!-- End Div for flashed messages -->
