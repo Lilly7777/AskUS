@@ -1,12 +1,14 @@
 # AskUS
 
 ```
-virtualenv env<br/>
-source env/bin/activate<br/>
+virtualenv env
+source env/bin/activate
 
-pip install -r requirements.txt<br/>
+pip install -r requirements.txt
 
-export FLASK_APP=file.py<br/>
-export FLASK_ENV=development<br/>
-flask run<br/>
+python database.py
+
+export FLASK_APP=file.py
+export FLASK_ENV=development
+flask run
 ```
