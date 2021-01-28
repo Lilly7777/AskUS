@@ -83,8 +83,14 @@
           <h6 class="card-subtitle mb-2 text-muted">{{post.uname}} @ {{post.timestamp}}</h6>
           <p class="card-text">{{post.content}}</p>
           {% if post.uname==uname %}
-          <button type="button" class="btn btn-primary btn-info">Edit</button>
-          <button type="button" class="btn btn-secondary btn-secondary">Delete</button>
+          <button type="button" class="btn btn-primary btn-info">
+            <a style="color: #ffffff;" href="/edit-post/{{post.id}}">
+               Edit
+            </a></button>
+          <button type="button" class="btn btn-secondary btn-secondary">
+            <a style="color: #ffffff;" href="/delete-post/{{post.id}}">
+               Delete
+            </a></button>
           {%endif%}
         </div>
       </div>
