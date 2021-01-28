@@ -209,7 +209,7 @@ def category_page(category_id):
 @app.route("/category/<category_id>/add-post", methods=['GET', 'POST'])
 def add_post(category_id):
     if request.method =='GET':
-        return render_template('add-post.html', category_id=category_id) #TODO
+        return render_template('add-post.html', category_id=category_id)
     if request.method == 'POST':
         title = request.form['inputTitle']
         content = request.form['inputContent']
@@ -221,6 +221,30 @@ def add_post(category_id):
         
         return redirect(('/category/' + str(category_id))) 
 
+@app.route("/edit-post/<post_id>", methods=['GET', 'POST'])
+def edit_post(post_id):
+    post = Post.query.filter_by(id=post_id).first()
+    if request.method =='GET':
+        return render_template('edit-post.html', post=post)
+    if request.method == 'POST':
+        title = request.form['inputTitle']
+        content = request.form['inputContent']
+
+        post.title = title
+        post.content = content
+        database.session.commit()
+        return redirect(('/category/' + str(post.category_id))) 
+
+@app.route("/delete-post/<post_id>", methods=['GET', 'POST'])
+def delete_post(post_id):
+    post = Post.query.filter_by(id=post_id).first()
+    category_id = post.category_id
+    if request.method =='GET':
+        return render_template('delete-post.html', post=post)
+    if request.method == 'POST':
+        Post.query.filter_by(id=post_id).delete()
+        database.session.commit()
+        return redirect(('/category/' + str(category_id))) 
 
 if __name__ == '__main__':
     app.run(debug=True)
